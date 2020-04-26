@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>贴吧</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="layui/css/layui.css">
+	<link rel="stylesheet" href="css/post_main.css">
+</head>
+<body class="lay-blog">
+		<div class="header">
+			<div class="header-wrap">
+				<h1 class="logo pull-left">
+					<p>
+						<img src="img/logo.png" alt="" class="logo-img">
+					</p>
+				</h1>
+				<div class="blog-nav pull-right">
+					<ul class="layui-nav pull-left">
+					  <li class="layui-nav-item"><a th:href="@{/toMainPostPage(type=${session.type})}">首页</a></li>
+					  <li class="layui-nav-item  layui-this"><a href="/toMessagePage">留言</a></li>
+					  <li class="layui-nav-item"><a href="/toNewsPage">退出</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="container-wrap">
+			<div class="container container-message">
+				<div class="contar-wrap" id="contar-wrap">
+					<form class="layui-form" action="">
+						<div class="layui-form-item">
+							<textarea class="layui-textarea layui-hide" id="messageContent" name="messageContent"></textarea>
+						</div>
+						<div class="item-btn">
+							<button class="layui-btn layui-btn-normal" id="item-btn" th:onclick="sendpostMessage([[${#authentication.name}]])">提交</button>
+						</div>
+					</form>
+
+					
+					<div id="LAY-msg-box" th:each="message,messageStat : ${messageList}">
+						<div class="info-box">
+							<div class="info-item">
+								<img class="info-img" src="img/info-img.png" alt="">
+								<div class="info-text">
+									<p class="title count">
+										<h5> <span th:text="${message.getMessageUsername()}"></span>  发布于：<span th:text="${message.getMessageTime()}">刚刚</span></h5>
+									</p>
+									<p class="info-intr" th:text="${message.getMessageContent()}"></p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="footer">
+			<p>
+				<span>&copy; 2018</span>
+				<span><a href="http://www.layui.com" target="_blank">layui.com</a></span> 
+				<span>MIT license</span>
+			</p>
+			<p><span>人生就是一场修行</span></p>
+		</div>
+	</div>
+</body>
+<script src="layui/layui.js"></script>
+<script>
+	layui.use(['element', 'form','laypage','jquery','laytpl','layedit'],function(exports){
+		var element = layui.element
+				,form = layui.form
+				,laypage = layui.laypage
+				,$ = layui.jquery
+				, layedit = layui.layedit
+				,laytpl = layui.laytpl;
+		//用于同步编辑器内容到textarea
+		layedit.sync(editIndex);
+		//创建一个编辑器
+		var editIndex = layedit.build('messageContent',{
+			height : 205,
+
+		});
+
+
+		window.sendpostMessage= function (username) {
+			$.ajax({
+				type: "post",
+				url: "USER/PostMessage",
+				data: {
+					messageUsername: username,
+					messageContent: layedit.getText(editIndex),
+				},
+				dataType: 'json',
+				success: function (data) {
+					alert("留言成功")
+				}
+			});
+		}
+
+
+
+
+	});
+
+</script>

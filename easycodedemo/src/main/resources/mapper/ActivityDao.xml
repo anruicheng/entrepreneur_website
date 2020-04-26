@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="an.easycodedemo.dao.ActivityDao">
+
+    <resultMap type="an.easycodedemo.entity.Activity" id="ActivityMap">
+        <result property="activityid" column="activityId" jdbcType="INTEGER"/>
+        <result property="activitytittle" column="activityTittle" jdbcType="VARCHAR"/>
+        <result property="activitydesc" column="activityDesc" jdbcType="VARCHAR"/>
+        <result property="activitycontent" column="activityContent" jdbcType="OTHER"/>
+        <result property="activityimagepath" column="activityImagePath" jdbcType="VARCHAR"/>
+        <result property="activitytime" column="activityTime" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="ActivityMap">
+        select
+          activityId, activityTittle, activityDesc, activityContent, activityImagePath, activityTime
+        from news_website.activity
+        where activityId = #{activityid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="ActivityMap">
+        select
+          activityId, activityTittle, activityDesc, activityContent, activityImagePath, activityTime
+        from news_website.activity
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="ActivityMap">
+        select
+          activityId, activityTittle, activityDesc, activityContent, activityImagePath, activityTime
+        from news_website.activity
+        <where>
+            <if test="activityid != null">
+                and activityId = #{activityid}
+            </if>
+            <if test="activitytittle != null and activitytittle != ''">
+                and activityTittle = #{activitytittle}
+            </if>
+            <if test="activitydesc != null and activitydesc != ''">
+                and activityDesc = #{activitydesc}
+            </if>
+            <if test="activitycontent != null">
+                and activityContent = #{activitycontent}
+            </if>
+            <if test="activityimagepath != null and activityimagepath != ''">
+                and activityImagePath = #{activityimagepath}
+            </if>
+            <if test="activitytime != null and activitytime != ''">
+                and activityTime = #{activitytime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="activityid" useGeneratedKeys="true">
+        insert into news_website.activity(activityTittle, activityDesc, activityContent, activityImagePath, activityTime)
+        values (#{activitytittle}, #{activitydesc}, #{activitycontent}, #{activityimagepath}, #{activitytime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update news_website.activity
+        <set>
+            <if test="activitytittle != null and activitytittle != ''">
+                activityTittle = #{activitytittle},
+            </if>
+            <if test="activitydesc != null and activitydesc != ''">
+                activityDesc = #{activitydesc},
+            </if>
+            <if test="activitycontent != null">
+                activityContent = #{activitycontent},
+            </if>
+            <if test="activityimagepath != null and activityimagepath != ''">
+                activityImagePath = #{activityimagepath},
+            </if>
+            <if test="activitytime != null and activitytime != ''">
+                activityTime = #{activitytime},
+            </if>
+        </set>
+        where activityId = #{activityid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from news_website.activity where activityId = #{activityid}
+    </delete>
+
+    <select id="searchActivityByTittle" resultMap="ActivityMap" parameterType="string">
+        select * from news_website.activity where activityTittle like CONCAT(CONCAT('%',#{tittleKey}),'%')
+    </select>
+</mapper>

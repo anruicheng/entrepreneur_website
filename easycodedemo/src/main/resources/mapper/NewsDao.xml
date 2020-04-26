@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="an.easycodedemo.dao.NewsDao">
+
+    <resultMap type="an.easycodedemo.entity.News" id="NewsMap">
+        <result property="newsid" column="newsId" jdbcType="INTEGER"/>
+        <result property="newstittle" column="newsTittle" jdbcType="VARCHAR"/>
+        <result property="newscontent" column="newsContent" jdbcType="VARCHAR"/>
+        <result property="newsdata" column="newsData" jdbcType="TIMESTAMP"/>
+        <result property="newsdesc" column="newsDesc" jdbcType="VARCHAR"/>
+        <result property="newsistop" column="newsIsTop" jdbcType="INTEGER"/>
+        <result property="newsimagepath" column="newsImagePath" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="NewsMap">
+        select
+          newsId, newsTittle, newsContent, newsData, newsDesc, newsIsTop, newsImagePath
+        from news_website.news
+        where newsId = #{newsid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="NewsMap">
+        select
+          newsId, newsTittle, newsContent, newsData, newsDesc, newsIsTop, newsImagePath
+        from news_website.news
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="NewsMap">
+        select
+          newsId, newsTittle, newsContent, newsData, newsDesc, newsIsTop, newsImagePath
+        from news_website.news
+        <where>
+            <if test="newsid != null">
+                and newsId = #{newsid}
+            </if>
+            <if test="newstittle != null and newstittle != ''">
+                and newsTittle = #{newstittle}
+            </if>
+            <if test="newscontent != null and newscontent != ''">
+                and newsContent = #{newscontent}
+            </if>
+            <if test="newsdata != null">
+                and newsData = #{newsdata}
+            </if>
+            <if test="newsdesc != null and newsdesc != ''">
+                and newsDesc = #{newsdesc}
+            </if>
+            <if test="newsistop != null">
+                and newsIsTop = #{newsistop}
+            </if>
+            <if test="newsimagepath != null and newsimagepath != ''">
+                and newsImagePath = #{newsimagepath}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="newsid" useGeneratedKeys="true">
+        insert into news_website.news(newsTittle, newsContent, newsData, newsDesc, newsIsTop, newsImagePath)
+        values (#{newstittle}, #{newscontent}, #{newsdata}, #{newsdesc}, #{newsistop}, #{newsimagepath})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update news_website.news
+        <set>
+            <if test="newstittle != null and newstittle != ''">
+                newsTittle = #{newstittle},
+            </if>
+            <if test="newscontent != null and newscontent != ''">
+                newsContent = #{newscontent},
+            </if>
+            <if test="newsdata != null">
+                newsData = #{newsdata},
+            </if>
+            <if test="newsdesc != null and newsdesc != ''">
+                newsDesc = #{newsdesc},
+            </if>
+            <if test="newsistop != null">
+                newsIsTop = #{newsistop},
+            </if>
+            <if test="newsimagepath != null and newsimagepath != ''">
+                newsImagePath = #{newsimagepath},
+            </if>
+        </set>
+        where newsId = #{newsid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from news_website.news where newsId = #{newsid}
+    </delete>
+
+    <select id="searchNewsByTittle" resultMap="NewsMap" parameterType="string">
+        select * from news_website.news where newsTittle like CONCAT(CONCAT('%',#{tittleKey}),'%')
+    </select>
+</mapper>

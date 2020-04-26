@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="an.easycodedemo.dao.PostMessageDao">
+
+    <resultMap type="an.easycodedemo.entity.PostMessage" id="PostMessageMap">
+        <result property="messageId" column="message_id" jdbcType="INTEGER"/>
+        <result property="messageContent" column="message_content" jdbcType="OTHER"/>
+        <result property="messageTime" column="message_time" jdbcType="VARCHAR"/>
+        <result property="messageUserid" column="message_userid" jdbcType="INTEGER"/>
+        <result property="messageUsername" column="message_username" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PostMessageMap">
+        select
+          message_id, message_content, message_time, message_userid, message_username
+        from news_website.post_message
+        where message_id = #{messageId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PostMessageMap">
+        select
+          message_id, message_content, message_time, message_userid, message_username
+        from news_website.post_message
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="PostMessageMap">
+        select
+          message_id, message_content, message_time, message_userid, message_username
+        from news_website.post_message
+        <where>
+            <if test="messageId != null">
+                and message_id = #{messageId}
+            </if>
+            <if test="messageContent != null">
+                and message_content = #{messageContent}
+            </if>
+            <if test="messageTime != null and messageTime != ''">
+                and message_time = #{messageTime}
+            </if>
+            <if test="messageUserid != null">
+                and message_userid = #{messageUserid}
+            </if>
+            <if test="messageUsername != null and messageUsername != ''">
+                and message_username = #{messageUsername}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="messageId" useGeneratedKeys="true">
+        insert into news_website.post_message(message_content, message_time, message_userid, message_username)
+        values (#{messageContent}, #{messageTime}, #{messageUserid}, #{messageUsername})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update news_website.post_message
+        <set>
+            <if test="messageContent != null">
+                message_content = #{messageContent},
+            </if>
+            <if test="messageTime != null and messageTime != ''">
+                message_time = #{messageTime},
+            </if>
+            <if test="messageUserid != null">
+                message_userid = #{messageUserid},
+            </if>
+            <if test="messageUsername != null and messageUsername != ''">
+                message_username = #{messageUsername},
+            </if>
+        </set>
+        where message_id = #{messageId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from news_website.post_message where message_id = #{messageId}
+    </delete>
+
+    <select id="searchByContent" resultMap="PostMessageMap" parameterType="string">
+        select * from news_website.post_message where message_content like CONCAT(CONCAT('%',#{key}),'%')
+    </select>
+</mapper>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>活动列表</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<link rel="stylesheet" href="layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+	<blockquote class="layui-elem-quote quoteBox">
+		<form class="layui-form">
+			<div class="layui-inline">
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input searchVal" placeholder="请输入活动标题关键字" />
+				</div>
+				<a class="layui-btn search_btn" data-type="reload">搜索</a>
+			</div>
+			<div class="layui-inline">
+				<a class="layui-btn layui-btn-normal addActivity_btn">添加活动</a>
+			</div>
+			<div class="layui-inline">
+				<a class="layui-btn layui-btn-danger layui-btn-normal delAll_btn">批量删除</a>
+			</div>
+		</form>
+	</blockquote>
+	<table id="activityList" lay-filter="activityList"></table>
+	<!--操作-->
+	<script type="text/html" id="activityListBar">
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+		<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+	</script>
+</form>
+<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" >
+	layui.use(['form','layer','laydate','table','laytpl'],function(){
+		var form = layui.form,
+				layer = parent.layer === undefined ? layui.layer : top.layer,
+				$ = layui.jquery,
+				laydate = layui.laydate,
+				laytpl = layui.laytpl,
+				table = layui.table;
+
+		//新闻列表
+		var tableIns = table.render({
+			elem: '#activityList',
+			url : 'ADMIN/activities',
+			cellMinWidth : 95,
+			page : true,
+			height : "full-125",
+			limit : 20,
+			limits : [10,15,20,25],
+			id : "activityListTable",
+			cols : [
+					[
+				{type: "checkbox", fixed:"left", width:50},
+				{field: 'activityid', title: 'ID', width:60, align:"center"},
+				{field: 'activitytittle', title: '活动标题', width:350},
+				{field: 'activitydesc', title: '活动简述', width:350},
+				{field: 'activitytime', title: '发布时间', align:'center', minWidth:70},
+				{title: '操作', width:170, templet:'#activityListBar',fixed:"right",align:"center"}
+			]
+			]
+		});
+
+		//根据标题搜索活动
+		$(".search_btn").on("click",function(){
+			if($(".searchVal").val() != ''){
+				tableIns.reload({
+					url: 'ADMIN/activity?tittleKey='+$(".searchVal").val(),
+					page: {
+						curr: 1 //重新从第 1 页开始
+					}
+				})
+			}else{
+				layer.msg("请输入活动标题关键字");
+			}
+		});
+		$(".addActivity_btn").click(function(){
+			addActivity();
+		})
+		//添加文章
+		function addActivity(){
+			var index = layui.layer.open({
+				title : "添加活动",
+				type : 2,
+				content : "activityAdd.html",
+				success : function(layero, index){
+					var body = layui.layer.getChildFrame('body', index);
+					setTimeout(function(){
+						layui.layer.tips('点击此处返回新闻列表', '.layui-layer-setwin .layui-layer-close', {
+							tips: 3
+						});
+					},500)
+				}
+			})
+			layui.layer.full(index);
+			//改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
+			$(window).on("resize",function(){
+				layui.layer.full(index);
+			})
+		}
+
+		function updateActivity(edit){
+			var index = layui.layer.open({
+				title : "更改活动",
+				type : 2,
+				content : "activityUpdate.html",
+				success : function(layero, index){
+					var body = layui.layer.getChildFrame('body', index);
+					body.find("#activityid").val(edit.activityid);
+					body.find("#activityTittle").val(edit.activitytittle);
+					body.find("#activityContent").val(edit.activitycontent);
+					form.render();
+				}
+			})
+			layui.layer.full(index);
+			//改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
+			$(window).on("resize",function(){
+				layui.layer.full(index);
+			})
+		}
+
+		//批量删除
+		$(".delAll_btn").click(function(){
+			var checkStatus = table.checkStatus('activityListTable'),
+					data = checkStatus.data,
+					Id = [];
+			if(data.length > 0) {
+				for (var i in data) {
+					Id.push(data[i].activityid);
+				}
+				layer.confirm('确定删除选中的活动？', {icon: 3, title: '提示信息'}, function (index) {
+					$.ajax({
+						type: "delete",
+						url: "ADMIN/activities",
+						traditional: true,
+						data: {activityid:Id},
+						success: function () {
+							alert("删除成功")
+						}
+					});
+					tableIns.reload();
+					layer.close(index);
+				})
+			}else{
+				layer.msg("请选择需要删除的文章");
+			}
+		})
+
+		//列表操作
+		table.on('tool(activityList)', function(obj){
+			var layEvent = obj.event,
+					data = obj.data;
+
+			if(layEvent === 'edit'){ //编辑
+				updateActivity(data);
+			} else if(layEvent === 'del'){ //删除
+				$.ajax({
+					type: "delete",
+					url: "ADMIN/activity",
+					data: {activityid:data.activityid},
+					success: function () {
+						alert("删除成功")
+					}
+				});
+			}
+		});
+
+	})
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>贴吧</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="layui/css/layui.css">
+	<link rel="stylesheet" href="css/post_main.css">
+</head>
+<body class="lay-blog">
+		<div class="header">
+			<div class="header-wrap">
+
+				<h1 class="logo pull-left">
+					<p>
+						<img src="img/logo.png" alt="" class="logo-img">
+					</p>
+				</h1>
+
+				<div class="blog-nav pull-right">
+					<ul class="layui-nav pull-left">
+					  <li class="layui-nav-item layui-this"><a href="/toMainPostPage?type=3">首页</a></li>
+					  <li class="layui-nav-item"><a href="/toMessagePage">留言</a></li>
+					  <li class="layui-nav-item"><a href="/toNewsPage">退出</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="container-wrap">
+			<div class="container">
+					<div class="contar-wrap">
+
+						<h4 class="item-title">
+							<p><i class="layui-icon layui-icon-speaker"></i>公告：<span>欢迎来到项目展示吧</span></p>
+						</h4>
+
+
+						<div class="item" th:each="mainpost,mainpostStat : ${mainpostList}">
+							<div class="item-box  layer-photos-demo2 layer-photos-demo">
+								<h3 ><a th:href="@{/toSubPost(mainpostid=${mainpost.getMainpostId()})}" th:text="${mainpost.getMainpostTittle()}"></a></h3>
+								<p th:text="${mainpost.getMainpostDesc()}"></p>
+								<h5>发布者：<span th:text="${mainpost.getMainpostUsername()}"></span>&nbsp;&nbsp;&nbsp;&nbsp;发布于：<span th:text="${mainpost.getMainpostTime()}"></span></h5>
+							</div>
+						</div>
+
+
+					</div>
+
+				<div class="item">
+					<form class="layui-form layui-row layui-col-space15">
+						<div class="item-box">
+							<h3 class="layui-form-item">发布新帖</h3>
+							<div class="layui-form-item">
+								<input type="text" class="layui-input" placeholder="请输入标题" id="mainPostTittle" name="mainPostTittle">
+							</div>
+							<div class="layui-form-item">
+								<textarea class="layui-textarea layui-hide" id="mainPostContent" name="mainPostContent"></textarea>
+							</div>
+							<div class="layui-right">
+								<a class="layui-btn layui-btn-sm" th:onclick="submitMainPost([[${#authentication.name}]])"><i class="layui-icon">&#xe609;</i>发布</a>
+							</div>
+						</div>
+					</form>
+				</div>
+
+			</div>
+		</div>
+		<div class="footer">
+			<p>
+				<span>&copy; 2018</span>
+				<span><a href="http://www.layui.com" target="_blank">layui.com</a></span> 
+				<span>MIT license</span>
+			</p>
+			<p><span>人生就是一场修行</span></p>
+		</div>
+</body>
+<script src="layui/layui.js"></script>
+<script>
+	layui.use(['element', 'form','laypage','jquery','laytpl','layedit','layer'],function(exports){
+		var element = layui.element
+				,form = layui.form
+				,laypage = layui.laypage
+				,$ = layui.jquery
+		        , layedit = layui.layedit
+				,laytpl = layui.laytpl
+				,layer = layui.layer;
+		//用于同步编辑器内容到textarea
+		layedit.sync(editIndex);
+		//创建一个编辑器
+		var editIndex = layedit.build('mainPostContent',{
+			height : 235,
+
+		});
+
+		window.submitMainPost= function (username) {
+			var abstract = layedit.getText(editIndex).substring(0,40);
+			$.ajax({
+				type: "post",
+				url: "USER/MainPost",
+				data: {
+					mainpostUsername: username,
+					mainpostTittle: $("#mainPostTittle").val(),
+					mainpostContent: layedit.getText(editIndex),
+					mainpostDesc: abstract,
+					mainpostType: 3,
+				},
+				dataType: 'json',
+				success: function (data) {
+					alert("发帖成功")
+				}
+			});
+		}
+	});
+
+</script>
+</html>

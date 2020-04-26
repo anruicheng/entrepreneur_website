@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="an.easycodedemo.dao.AttendrecordDao">
+
+    <resultMap type="an.easycodedemo.entity.Attendrecord" id="AttendrecordMap">
+        <result property="attendrecordid" column="attendrecordId" jdbcType="INTEGER"/>
+        <result property="attendrecorduserid" column="attendrecordUserId" jdbcType="INTEGER"/>
+        <result property="attendrecordcompid" column="attendrecordCompId" jdbcType="INTEGER"/>
+        <result property="isforbidden" column="isforbidden" jdbcType="INTEGER"/>
+        <result property="attendrecordtime" column="attendrecordTime" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="AttendrecordMap">
+        select
+          attendrecordId, attendrecordUserId, attendrecordCompId, isforbidden, attendrecordTime
+        from news_website.attendrecord
+        where attendrecordId = #{attendrecordid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="AttendrecordMap">
+        select
+          attendrecordId, attendrecordUserId, attendrecordCompId, isforbidden, attendrecordTime
+        from news_website.attendrecord
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="AttendrecordMap">
+        select
+          attendrecordId, attendrecordUserId, attendrecordCompId, isforbidden, attendrecordTime
+        from news_website.attendrecord
+        <where>
+            <if test="attendrecordid != null">
+                and attendrecordId = #{attendrecordid}
+            </if>
+            <if test="attendrecorduserid != null">
+                and attendrecordUserId = #{attendrecorduserid}
+            </if>
+            <if test="attendrecordcompid != null">
+                and attendrecordCompId = #{attendrecordcompid}
+            </if>
+            <if test="isforbidden != null">
+                and isforbidden = #{isforbidden}
+            </if>
+            <if test="attendrecordtime != null and attendrecordtime != ''">
+                and attendrecordTime = #{attendrecordtime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="attendrecordid" useGeneratedKeys="true">
+        insert into news_website.attendrecord(attendrecordUserId, attendrecordCompId, isforbidden, attendrecordTime)
+        values (#{attendrecorduserid}, #{attendrecordcompid}, #{isforbidden}, #{attendrecordtime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update news_website.attendrecord
+        <set>
+            <if test="attendrecorduserid != null">
+                attendrecordUserId = #{attendrecorduserid},
+            </if>
+            <if test="attendrecordcompid != null">
+                attendrecordCompId = #{attendrecordcompid},
+            </if>
+            <if test="isforbidden != null">
+                isforbidden = #{isforbidden},
+            </if>
+            <if test="attendrecordtime != null and attendrecordtime != ''">
+                attendrecordTime = #{attendrecordtime},
+            </if>
+        </set>
+        where attendrecordId = #{attendrecordid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from news_website.attendrecord where attendrecordId = #{attendrecordid}
+    </delete>
+
+</mapper>

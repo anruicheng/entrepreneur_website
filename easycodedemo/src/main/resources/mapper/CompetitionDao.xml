@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="an.easycodedemo.dao.CompetitionDao">
+
+    <resultMap type="an.easycodedemo.entity.Competition" id="CompetitionMap">
+        <result property="competitionId" column="competition_id" jdbcType="INTEGER"/>
+        <result property="competitionTittle" column="competition_tittle" jdbcType="VARCHAR"/>
+        <result property="competitionDesc" column="competition_desc" jdbcType="VARCHAR"/>
+        <result property="competitionContent" column="competition_content" jdbcType="VARCHAR"/>
+        <result property="competitionTime" column="competition_time" jdbcType="VARCHAR"/>
+        <result property="competitionImagepath" column="competition_imagepath" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="CompetitionMap">
+        select
+          competition_id, competition_tittle, competition_desc, competition_content, competition_time, competition_imagepath
+        from news_website.competition
+        where competition_id = #{competitionId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="CompetitionMap">
+        select
+          competition_id, competition_tittle, competition_desc, competition_content, competition_time, competition_imagepath
+        from news_website.competition
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="CompetitionMap">
+        select
+          competition_id, competition_tittle, competition_desc, competition_content, competition_time, competition_imagepath
+        from news_website.competition
+        <where>
+            <if test="competitionId != null">
+                and competition_id = #{competitionId}
+            </if>
+            <if test="competitionTittle != null and competitionTittle != ''">
+                and competition_tittle = #{competitionTittle}
+            </if>
+            <if test="competitionDesc != null and competitionDesc != ''">
+                and competition_desc = #{competitionDesc}
+            </if>
+            <if test="competitionContent != null and competitionContent != ''">
+                and competition_content = #{competitionContent}
+            </if>
+            <if test="competitionTime != null and competitionTime != ''">
+                and competition_time = #{competitionTime}
+            </if>
+            <if test="competitionImagepath != null and competitionImagepath != ''">
+                and competition_imagepath = #{competitionImagepath}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="competitionId" useGeneratedKeys="true">
+        insert into news_website.competition(competition_tittle, competition_desc, competition_content, competition_time, competition_imagepath)
+        values (#{competitionTittle}, #{competitionDesc}, #{competitionContent}, #{competitionTime}, #{competitionImagepath})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update news_website.competition
+        <set>
+            <if test="competitionTittle != null and competitionTittle != ''">
+                competition_tittle = #{competitionTittle},
+            </if>
+            <if test="competitionDesc != null and competitionDesc != ''">
+                competition_desc = #{competitionDesc},
+            </if>
+            <if test="competitionContent != null and competitionContent != ''">
+                competition_content = #{competitionContent},
+            </if>
+            <if test="competitionTime != null and competitionTime != ''">
+                competition_time = #{competitionTime},
+            </if>
+            <if test="competitionImagepath != null and competitionImagepath != ''">
+                competition_imagepath = #{competitionImagepath},
+            </if>
+        </set>
+        where competition_id = #{competitionId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from news_website.competition where competition_id = #{competitionId}
+    </delete>
+
+</mapper>

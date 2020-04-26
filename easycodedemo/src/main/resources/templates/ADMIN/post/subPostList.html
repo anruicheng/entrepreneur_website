@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>从贴模块</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<link rel="stylesheet" href="layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="css/public.css" media="all" />
+</head>
+<body class="childrenBody">
+<form class="layui-form">
+	<blockquote class="layui-elem-quote quoteBox">
+		<form class="layui-form">
+			<div class="layui-inline">
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input searchVal" placeholder="请输入主贴id" />
+				</div>
+				<a class="layui-btn search_btn" data-type="reload">搜索</a>
+			</div>
+			<div class="layui-inline">
+				<a class="layui-btn layui-btn-danger layui-btn-normal delAll_btn">批量删除</a>
+			</div>
+		</form>
+	</blockquote>
+	<table id="List" lay-filter="List"></table>
+	<!--操作-->
+	<script type="text/html" id="ListBar">
+		<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+	</script>
+</form>
+<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" >
+	layui.use(['form','layer','laydate','table','laytpl'],function(){
+		var form = layui.form,
+				layer = parent.layer === undefined ? layui.layer : top.layer,
+				$ = layui.jquery,
+				laydate = layui.laydate,
+				laytpl = layui.laytpl,
+				table = layui.table;
+
+		//新闻列表
+		var tableIns = table.render({
+			elem: '#List',
+			url : 'ADMIN/allSubPost',
+			cellMinWidth : 95,
+			page : true,
+			height : "full-125",
+			limit : 20,
+			limits : [10,15,20,25],
+			id : "ListTable",
+			cols : [
+					[
+				{type: "checkbox", fixed:"left", width:50},
+				{field: 'subpostId', title: 'ID', width:60, align:"center"},
+				{field: 'subpostContent', title: '内容', width:600},
+				{field: 'subpostTime', title: '时间', align:'center', minWidth:60},
+				{field: 'subpostUsername', title: '发布者', width:100, align:"center"},
+				{field: 'subpostMainid', title: '主贴id', width:60, align:"center"},
+				{title: '操作', width:170, templet:'#ListBar',fixed:"right",align:"center"}
+			]
+			]
+		});
+
+		//根据主帖id搜索
+		$(".search_btn").on("click",function(){
+			if($(".searchVal").val() != ''){
+				tableIns.reload({
+					url: 'ADMIN/SubPost?mainPostId='+$(".searchVal").val(),
+					page: {
+						curr: 1 //重新从第 1 页开始
+					}
+				})
+			}else{
+				layer.msg("请输入主贴id");
+			}
+		});
+		//批量删除
+		$(".delAll_btn").click(function(){
+			var checkStatus = table.checkStatus('ListTable'),
+					data = checkStatus.data,
+					Id = [];
+			if(data.length > 0) {
+				for (var i in data) {
+					Id.push(data[i].subpostId);
+				}
+				layer.confirm('确定删除选中的帖子？', {icon: 3, title: '提示信息'}, function (index) {
+					$.ajax({
+						type: "delete",
+						url: "ADMIN/SubPosts",
+						traditional: true,
+						data: {id:Id},
+						success: function () {
+							alert("删除成功")
+						}
+					});
+					tableIns.reload();
+					layer.close(index);
+				})
+			}else{
+				layer.msg("请选择需要删除的文章");
+			}
+		})
+
+		//列表操作
+		table.on('tool(List)', function(obj){
+			var layEvent = obj.event,
+					data = obj.data;
+
+			if(layEvent === 'del'){ //删除
+				$.ajax({
+					type: "delete",
+					url: "ADMIN/SubPost",
+					data: {competitionId:data.competitionId},
+					success: function () {
+						alert("删除成功")
+					}
+				});
+			}
+		});
+
+	})
+</script>
+</body>
+</html>

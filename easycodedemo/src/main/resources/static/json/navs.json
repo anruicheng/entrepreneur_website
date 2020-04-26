@@ -1,0 +1,55 @@
+{
+	"contentManagement": [
+		{
+			"title": "新闻模块",
+			"icon": "&#xe655;",
+			"href": "newsList.html",
+			"spread": false
+		},
+		{
+			"title": "用户管理",
+			"icon": "&#xe770;",
+			"href": "userList.html",
+			"spread": false
+		},
+		{
+			"title": "通知模块",
+			"icon": "&#xe667;",
+			"href": "activityList.html",
+			"spread": false
+		},
+		{
+			"title": "比赛模块",
+			"icon": "&#xe656;",
+			"href": "competitionList.html",
+			"spread": false
+		},
+		{
+			"title": "主贴模块",
+			"icon": "&#xe638;",
+			"href": "mainPostList.html",
+			"spread": false
+		},
+		{
+			"title": "从贴模块",
+			"icon": "&#xe630;",
+			"href": "subPostList.html",
+			"spread": false
+		},
+		{
+			"title": "留言模块",
+			"icon": "&#xe6b2;",
+			"href": "postMessageList.html",
+			"spread": false
+		},
+		{
+			"title": "参赛记录",
+			"icon": "&#xe653;",
+			"href": "attendRecord.html",
+			"spread": false
+		}
+
+	]
+}
+
+

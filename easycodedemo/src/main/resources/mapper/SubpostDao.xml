@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="an.easycodedemo.dao.SubpostDao">
+
+    <resultMap type="an.easycodedemo.entity.Subpost" id="SubpostMap">
+        <result property="subpostId" column="subpost_id" jdbcType="INTEGER"/>
+        <result property="subpostContent" column="subpost_content" jdbcType="VARCHAR"/>
+        <result property="subpostTime" column="subpost_time" jdbcType="VARCHAR"/>
+        <result property="subpostMainid" column="subpost_mainid" jdbcType="INTEGER"/>
+        <result property="subpostUserid" column="subpost_userid" jdbcType="INTEGER"/>
+        <result property="subpostUsername" column="subpost_username" jdbcType="VARCHAR"/>
+        <result property="subpostFloor" column="subpost_floor" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="SubpostMap">
+        select
+          subpost_id, subpost_content, subpost_time, subpost_mainid, subpost_userid, subpost_username, subpost_floor
+        from news_website.subpost
+        where subpost_id = #{subpostId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="SubpostMap">
+        select
+          subpost_id, subpost_content, subpost_time, subpost_mainid, subpost_userid, subpost_username, subpost_floor
+        from news_website.subpost
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="SubpostMap">
+        select
+          subpost_id, subpost_content, subpost_time, subpost_mainid, subpost_userid, subpost_username, subpost_floor
+        from news_website.subpost
+        <where>
+            <if test="subpostId != null">
+                and subpost_id = #{subpostId}
+            </if>
+            <if test="subpostContent != null and subpostContent != ''">
+                and subpost_content = #{subpostContent}
+            </if>
+            <if test="subpostTime != null and subpostTime != ''">
+                and subpost_time = #{subpostTime}
+            </if>
+            <if test="subpostMainid != null">
+                and subpost_mainid = #{subpostMainid}
+            </if>
+            <if test="subpostUserid != null">
+                and subpost_userid = #{subpostUserid}
+            </if>
+            <if test="subpostUsername != null and subpostUsername != ''">
+                and subpost_username = #{subpostUsername}
+            </if>
+            <if test="subpostFloor != null">
+                and subpost_floor = #{subpostFloor}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="subpostId" useGeneratedKeys="true">
+        insert into news_website.subpost(subpost_content, subpost_time, subpost_mainid, subpost_userid, subpost_username, subpost_floor)
+        values (#{subpostContent}, #{subpostTime}, #{subpostMainid}, #{subpostUserid}, #{subpostUsername}, #{subpostFloor})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update news_website.subpost
+        <set>
+            <if test="subpostContent != null and subpostContent != ''">
+                subpost_content = #{subpostContent},
+            </if>
+            <if test="subpostTime != null and subpostTime != ''">
+                subpost_time = #{subpostTime},
+            </if>
+            <if test="subpostMainid != null">
+                subpost_mainid = #{subpostMainid},
+            </if>
+            <if test="subpostUserid != null">
+                subpost_userid = #{subpostUserid},
+            </if>
+            <if test="subpostUsername != null and subpostUsername != ''">
+                subpost_username = #{subpostUsername},
+            </if>
+            <if test="subpostFloor != null">
+                subpost_floor = #{subpostFloor},
+            </if>
+        </set>
+        where subpost_id = #{subpostId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from news_website.subpost where subpost_id = #{subpostId}
+    </delete>
+
+    <select id="getFloor" resultType="int" parameterType="int">
+        select COUNT(subpost_mainid) from news_website.subpost where subpost_mainid= #{Mainid};
+    </select>
+</mapper>
